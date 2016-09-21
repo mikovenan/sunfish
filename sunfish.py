@@ -452,37 +452,44 @@ def main():
         print_pos(pos)
 
         if pos.score <= -MATE_LOWER:
-            print("You lost")
+            print("Black won")
             break
 
-        # We query the user until she enters a (pseudo) legal move.
-        move = None
-        while move not in pos.gen_moves():
-            match = re.match('([a-h][1-8])'*2, input('Your move: '))
-            if match:
-                move = parse(match.group(1)), parse(match.group(2))
-            else:
-                # Inform the user when invalid input (e.g. "help") is entered
-                print("Please enter a move like g8f6")
+        move, score = searcher.search(pos, secs=1)
+        if score == MATE_UPPER:
+            print("Checkmate!")
+
+        print("White's move:", render(move[0]) + render(move[1]))
         pos = pos.move(move)
+
+        # # We query the user until she enters a (pseudo) legal move.
+        # move = None
+        # while move not in pos.gen_moves():
+        #     match = re.match('([a-h][1-8])'*2, input('Your move: '))
+        #     if match:
+        #         move = parse(match.group(1)), parse(match.group(2))
+        #     else:
+        #         # Inform the user when invalid input (e.g. "help") is entered
+        #         print("Please enter a move like g8f6")
+        # pos = pos.move(move)
 
         # After our move we rotate the board and print it again.
         # This allows us to see the effect of our move.
         print_pos(pos.rotate())
 
         if pos.score <= -MATE_LOWER:
-            print("You won")
+            print("White won")
             break
 
         # Fire up the engine to look for a move.
-        move, score = searcher.search(pos, secs=2)
+        move, score = searcher.search(pos, secs=1)
 
         if score == MATE_UPPER:
             print("Checkmate!")
 
         # The black player moves from a rotated position, so we have to
         # 'back rotate' the move before printing it.
-        print("My move:", render(119-move[0]) + render(119-move[1]))
+        print("Black's move:", render(119-move[0]) + render(119-move[1]))
         pos = pos.move(move)
 
 
